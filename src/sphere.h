@@ -1,5 +1,6 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
+#include "geometry.h"
 
 struct Sphere {
     Vec3f center;
