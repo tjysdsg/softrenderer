@@ -44,7 +44,12 @@ struct vec<2, T> {
         assert(i < 2);
         return i <= 0 ? x : y;
     }
-    T x, y;
+    union {
+        struct {
+            T x, y;
+        };
+        T data_[2];
+    };
 };
 
 template <typename T>
@@ -64,7 +69,12 @@ struct vec<3, T> {
         *this = (*this) * (l / norm());
         return *this;
     }
-    T x, y, z;
+    union {
+        struct {
+            T x, y, z;
+        };
+        T data_[3];
+    };
 };
 
 template <typename T>
@@ -79,36 +89,41 @@ struct vec<4, T> {
         assert(i < 4);
         return i <= 0 ? x : (1 == i ? y : (2 == i ? z : w));
     }
-    T x, y, z, w;
+    union {
+        struct {
+            T x, y, z, w;
+        };
+        T data_[4];
+    };
 };
 
 template <size_t DIM, typename T>
 T operator*(const vec<DIM, T>& lhs, const vec<DIM, T>& rhs) {
     T ret = T();
-    for (size_t i = DIM; i--; ret += lhs[i] * rhs[i])
-        ;
+    for (size_t i = DIM; i--; ret += lhs[i] * rhs[i]) {
+    }
     return ret;
 }
 
 template <size_t DIM, typename T>
 vec<DIM, T> operator+(vec<DIM, T> lhs, const vec<DIM, T>& rhs) {
-    for (size_t i = DIM; i--; lhs[i] += rhs[i])
-        ;
+    for (size_t i = DIM; i--; lhs[i] += rhs[i]) {
+    }
     return lhs;
 }
 
 template <size_t DIM, typename T>
 vec<DIM, T> operator-(vec<DIM, T> lhs, const vec<DIM, T>& rhs) {
-    for (size_t i = DIM; i--; lhs[i] -= rhs[i])
-        ;
+    for (size_t i = DIM; i--; lhs[i] -= rhs[i]) {
+    }
     return lhs;
 }
 
 template <size_t DIM, typename T, typename U>
 vec<DIM, T> operator*(const vec<DIM, T>& lhs, const U& rhs) {
     vec<DIM, T> ret;
-    for (size_t i = DIM; i--; ret[i] = lhs[i] * rhs)
-        ;
+    for (size_t i = DIM; i--; ret[i] = lhs[i] * rhs) {
+    }
     return ret;
 }
 
