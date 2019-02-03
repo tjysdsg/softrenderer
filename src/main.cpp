@@ -1,5 +1,6 @@
 #include "geometry.h"
 #include "image.h"
+#include "light.h"
 #include "macro.h"
 #include "sphere.h"
 
@@ -24,13 +25,21 @@ __RAYTRACER_API__ bool scene_intersect(__in__ const Vec3f orig,
 }
 
 Vec3f raycast_test(const Vec3f &orig, const Vec3f &dir,
-                   const std::vector<Sphere> spheres) {
+                   const std::vector<Sphere> spheres,
+                   std::vector<Light> lights) {
     Vec3f point, N;
     Material material;
     if (!scene_intersect(orig, dir, spheres, point, N, material)) {
         return Vec3f(0.2, 0.7, 0.8);  // background color
     }
-    return material.diffuse_color;
+    // calculate light
+    float diffuse_light_intensity = 0;
+    for (size_t i = 0; i < lights.size(); i++) {
+        Vec3f light_dir = (lights[i].position - point).normalize();
+        diffuse_light_intensity +=
+            lights[i].intensity * std::max(0.f, light_dir * N);
+    }
+    return material.diffuse_color * diffuse_light_intensity;
 }
 
 int main() {
@@ -46,6 +55,9 @@ int main() {
     spheres.push_back(Sphere(Vec3f(-1.0, -1.5, -12), 2, red_rubber));
     spheres.push_back(Sphere(Vec3f(1.5, -0.5, -18), 3, red_rubber));
     spheres.push_back(Sphere(Vec3f(7, 5, -18), 4, ivory));
+    //
+    std::vector<Light> lights;
+    lights.push_back(Light(Vec3f(-20, 20, 20), 1.5));
 
     for (size_t j = 0; j < height; j++) {
         for (size_t i = 0; i < width; i++) {
@@ -54,7 +66,7 @@ int main() {
             float y = -(2 * (j + 0.5) / (float)height - 1) * tan(fov / 2.);
             Vec3f dir = Vec3f(x, y, -1).normalize();
             framebuffer[i + j * width] =
-                raycast_test(Vec3f(0, 0, 0), dir, spheres);
+                raycast_test(Vec3f(0, 0, 0), dir, spheres, lights);
         }
     }
 
