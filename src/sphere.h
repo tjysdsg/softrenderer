@@ -27,5 +27,4 @@ struct Sphere {
         return true;
     }
 };
-
 #endif  // __SPHERE_H__
