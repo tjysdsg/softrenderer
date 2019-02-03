@@ -19,16 +19,15 @@ __RAYTRACER_API__ bool scene_intersect(__in__ const Vec3f orig,
             dist_i < spheres_dist) {
             spheres_dist = dist_i;
             hit = orig + dir * dist_i;
-            N = (hit - spheres[i].center).normalize();
-            material = spheres[i].material;
+            N = (hit - spheres[i].get_center()).normalize();
+            material = spheres[i].get_material();
         }
     }
     return spheres_dist < 1000;
 }
 
-Vec3f raycast_test(const Vec3f &orig, const Vec3f &dir,
-                   const std::vector<Sphere> spheres,
-                   std::vector<Light> lights) {
+Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
+               const std::vector<Sphere> spheres, std::vector<Light> lights) {
     Vec3f point, N;
     Material material;
     if (!scene_intersect(orig, dir, spheres, point, N, material)) {
@@ -91,7 +90,7 @@ int main() {
                       width / (float)height;
             float y = -(2 * (j + 0.5) / (float)height - 1) * tan(fov / 2.);
             Vec3f dir = Vec3f(x, y, -1).normalize();
-            Vec3f c = raycast_test(Vec3f(0, 0, 0), dir, spheres, lights);
+            Vec3f c = emit_ray(Vec3f(0, 0, 0), dir, spheres, lights);
             float max = std::max(c[0], std::max(c[1], c[2]));
             if (max > 1) c = c * (1. / max);
             framebuffer[i + j * width] = c;
