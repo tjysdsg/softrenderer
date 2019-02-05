@@ -1,9 +1,11 @@
+#include "config.h"
 #include "geometry.h"
 #include "image.h"
 #include "light.h"
 #include "macro.h"
 #include "material.h"
 #include "sphere.h"
+
 Vec3f reflect(const Vec3f &I, const Vec3f &N) { return I - N * 2.f * (I * N); }
 
 // TODO: refactor this rubbish API
@@ -33,7 +35,8 @@ Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
     Material material;
     // if there is no reflection and intersection with other object, return the
     // background color
-    if (depth > 4 || !scene_intersect(orig, dir, spheres, point, N, material)) {
+    if (depth > reflection_depth ||
+        !scene_intersect(orig, dir, spheres, point, N, material)) {
         return Vec3f(0.2, 0.7, 0.8);  // background color
     }
     // calculate reflection
@@ -44,7 +47,6 @@ Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
             : point + N * 1e-3;  // offset the original point to avoid occlusion
                                  // by the object itself
     // emit ray recursively until depth is greater than
-    // TODO property reflection_depth
     Vec3f reflect_color =
         emit_ray(reflect_orig, reflect_dir, spheres, lights, depth + 1);
 
