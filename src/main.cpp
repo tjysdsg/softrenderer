@@ -27,25 +27,25 @@ Vec3f refract(const Vec3f I, const Vec3f N,
 // TODO: refactor this rubbish API
 __RAYTRACER_API__ bool scene_intersect(__in__ const Vec3f orig,
                                        __in__ const Vec3f dir,
-                                       __in__ const std::vector<Sphere> spheres,
+                                       __in__ const std::vector<void *> spheres,
                                        __out__ Vec3f &hit, __out__ Vec3f &N,
                                        __out__ Material &material) {
     float spheres_dist = std::numeric_limits<float>::max();
     for (size_t i = 0; i < spheres.size(); i++) {
         float dist_i;
-        if (spheres[i].ray_intersect(orig, dir, dist_i) &&
+        if (((Sphere *)(spheres[i]))->ray_intersect(orig, dir, dist_i) &&
             dist_i < spheres_dist) {
             spheres_dist = dist_i;
             hit = orig + dir * dist_i;
-            N = (hit - spheres[i].get_center()).normalize();
-            material = spheres[i].get_material();
+            N = (hit - ((Sphere *)(spheres[i]))->center).normalize();
+            material = ((Sphere *)(spheres[i]))->material;
         }
     }
     return spheres_dist < 1000;
 }
 
 Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
-               const std::vector<Sphere> spheres, std::vector<Light> lights,
+               const std::vector<void *> spheres, std::vector<Light> lights,
                size_t depth = 0) {
     Vec3f point, N;
     Material material;
@@ -122,11 +122,11 @@ int main() {
                     1425.);
 
     // add some spheres with material into the scene
-    std::vector<Sphere> spheres;
-    spheres.push_back(Sphere(Vec3f(-3, 0, -16), 2, ivory));
-    spheres.push_back(Sphere(Vec3f(-1.0, -1.5, -12), 2, glass));
-    spheres.push_back(Sphere(Vec3f(1.5, -0.5, -18), 3, red_rubber));
-    spheres.push_back(Sphere(Vec3f(7, 5, -18), 4, mirror));
+    std::vector<void *> spheres;
+    spheres.push_back(new Sphere(Vec3f(-3, 0, -16), 2, ivory));
+    spheres.push_back(new Sphere(Vec3f(-1.0, -1.5, -12), 2, glass));
+    spheres.push_back(new Sphere(Vec3f(1.5, -0.5, -18), 3, red_rubber));
+    spheres.push_back(new Sphere(Vec3f(7, 5, -18), 4, mirror));
     // add some light sources
     std::vector<Light> lights;
     lights.push_back(Light(Vec3f(-20, 20, 20), 1.5));

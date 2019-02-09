@@ -4,25 +4,26 @@
 #include "macro.h"
 #include "material.h"
 
-class Mesh {
-public:
-    virtual bool ray_intersect(__in__ const Vec3f orig, __in__ const Vec3f dir,
-                               __in_out__ float &t0) const = 0;
-    virtual Material get_material() const = 0;
-    virtual ~Mesh(){};
-    Mesh(){};
+#define GET_MESH_TYPE(m) (*((mesh_type *)((void *)(m))))
+
+typedef enum { BOX, SPHERE, PLANE } mesh_type;
+
+struct Mesh {
+    mesh_type type;
+    Vec3f center;
+    Material material;
 };
 
-class Sphere : public Mesh {
-private:
+struct Sphere {
+    mesh_type type;
     Vec3f center;
-    float radius;
     Material material;
 
-public:
-    __RAYTRACER_API__ Sphere() : center(), radius(), material() {}
+    float radius;
+
+    __RAYTRACER_API__ Sphere() : type(SPHERE), center(), radius(), material() {}
     __RAYTRACER_API__ Sphere(const Vec3f &c, const float &r, const Material &m)
-        : center(c), radius(r), material(m) {}
+        : type(SPHERE), center(c), radius(r), material(m) {}
 
     __RAYTRACER_API__ bool ray_intersect(__in__ const Vec3f orig,
                                          __in__ const Vec3f dir,
@@ -38,8 +39,5 @@ public:
         if (t0 < 0) return false;
         return true;
     }
-    __RAYTRACER_API__ Material get_material() const { return material; }
-    __RAYTRACER_API__ float get_radius() const { return radius; }
-    __RAYTRACER_API__ Vec3f get_center() const { return center; }
 };
 #endif  // __SPHERE_H__
