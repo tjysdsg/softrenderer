@@ -6,6 +6,8 @@
 
 #define GET_MESH_TYPE(m) (*((mesh_type *)((void *)(m))))
 
+typedef void *mesh_ptr;
+
 typedef enum { BOX, SPHERE, PLANE } mesh_type;
 
 struct Mesh {
@@ -40,4 +42,5 @@ struct Sphere {
         return true;
     }
 };
+
 #endif  // __SPHERE_H__

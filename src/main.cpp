@@ -24,21 +24,21 @@ Vec3f refract(const Vec3f I, const Vec3f N,
     return k < 0 ? Vec3f(0, 0, 0) : I * eta + n * (eta * cosi - sqrtf(k));
 }
 
-// TODO: refactor this rubbish API
 __RAYTRACER_API__ bool scene_intersect(__in__ const Vec3f orig,
                                        __in__ const Vec3f dir,
                                        __in__ const std::vector<void *> spheres,
                                        __out__ Vec3f &hit, __out__ Vec3f &N,
-                                       __out__ Material &material) {
+                                       __out__ mesh_ptr &pmesh) {
     float spheres_dist = std::numeric_limits<float>::max();
     for (size_t i = 0; i < spheres.size(); i++) {
         float dist_i;
+        /* TODO get mesh type */
         if (((Sphere *)(spheres[i]))->ray_intersect(orig, dir, dist_i) &&
             dist_i < spheres_dist) {
             spheres_dist = dist_i;
             hit = orig + dir * dist_i;
             N = (hit - ((Sphere *)(spheres[i]))->center).normalize();
-            material = ((Sphere *)(spheres[i]))->material;
+            pmesh = spheres[i];
         }
     }
     return spheres_dist < 1000;
@@ -49,12 +49,14 @@ Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
                size_t depth = 0) {
     Vec3f point, N;
     Material material;
+    mesh_ptr pmesh;
     // if there is no reflection and intersection with other object, return the
     // background color
     if (depth > reflection_depth ||
-        !scene_intersect(orig, dir, spheres, point, N, material)) {
+        !scene_intersect(orig, dir, spheres, point, N, pmesh)) {
         return Vec3f(0.2, 0.7, 0.8);  // background color
     }
+    material = ((Sphere *)pmesh)->material;
     // calculate reflection
     Vec3f reflect_dir = reflect(dir, N).normalize();
     Vec3f reflect_orig =
@@ -87,9 +89,9 @@ Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
                 : point + N * 1e-3;  // checking if the point lies in the shadow
                                      // of the lights[i]
         Vec3f shadow_pt, shadow_N;
-        Material tmpmaterial;
+        mesh_ptr tmpmesh;
         if (scene_intersect(shadow_orig, light_dir, spheres, shadow_pt,
-                            shadow_N, tmpmaterial) &&
+                            shadow_N, tmpmesh) &&
             (shadow_pt - shadow_orig).norm() < light_distance)
             continue;
 
