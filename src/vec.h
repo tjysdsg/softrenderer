@@ -1,5 +1,5 @@
-#ifndef __GEOMETRY_H__
-#define __GEOMETRY_H__
+#ifndef __VEC_H__
+#define __VEC_H__
 
 #include <cassert>
 #include <cmath>
@@ -143,4 +143,4 @@ std::ostream& operator<<(std::ostream& out, const vec<DIM, T>& v) {
     for (unsigned int i = 0; i < DIM; i++) out << v[i] << " ";
     return out;
 }
-#endif  //__GEOMETRY_H__
+#endif  //__VEC_H__

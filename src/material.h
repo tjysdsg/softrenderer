@@ -1,7 +1,8 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
-#include "geometry.h"
+#include "vec.h"
+
 struct Material {
     Vec3f diffuse_color;
     Material(const float r, const Vec4f a, const Vec3f color, const float spec)

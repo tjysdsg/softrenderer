@@ -1,6 +1,6 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
-#include "geometry.h"
+#include "vec.h"
 #include "macro.h"
 #include "material.h"
 

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <limits>
 #include <vector>
-#include "geometry.h"
+#include "vec.h"
 
 void render2img(const char* name, const int width, const int height,
                 std::vector<Vec3f> framebuffer);

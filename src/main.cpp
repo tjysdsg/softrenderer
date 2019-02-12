@@ -1,5 +1,5 @@
 #include "config.h"
-#include "geometry.h"
+#include "vec.h"
 #include "image.h"
 #include "light.h"
 #include "macro.h"
