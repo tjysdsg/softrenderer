@@ -1,35 +1,32 @@
 #ifndef __SPHERE_H__
 #define __SPHERE_H__
-#include "vec.h"
 #include "macro.h"
 #include "material.h"
+#include "vec.h"
 
-#define GET_MESH_TYPE(m) (*((mesh_type *)((void *)(m))))
-
-typedef void *mesh_ptr;
-
-typedef enum { BOX, SPHERE, PLANE } mesh_type;
-
-struct Mesh {
-    mesh_type type;
+class Mesh {
+public:
     Vec3f center;
     Material material;
+    Mesh() : center(), material() {}
+    Mesh(const Vec3f _center, const Material _material)
+        : center(_center), material(_material) {}
+    virtual ~Mesh() {}
+    virtual bool ray_intersect(const Vec3f orig, const Vec3f dir,
+                               float &t0) const {
+        return false;
+    }
 };
 
-struct Sphere {
-    mesh_type type;
-    Vec3f center;
-    Material material;
-
+class Sphere : public Mesh {
+public:
     float radius;
+    Sphere() : Mesh(), radius() {}
+    Sphere(const Vec3f c, const float r, const Material m)
+        : Mesh(c, m), radius(r) {}
+    ~Sphere() {}
 
-    __RAYTRACER_API__ Sphere() : type(SPHERE), center(), radius(), material() {}
-    __RAYTRACER_API__ Sphere(const Vec3f &c, const float &r, const Material &m)
-        : type(SPHERE), center(c), radius(r), material(m) {}
-
-    __RAYTRACER_API__ bool ray_intersect(__in__ const Vec3f orig,
-                                         __in__ const Vec3f dir,
-                                         __in_out__ float &t0) const {
+    bool ray_intersect(const Vec3f orig, const Vec3f dir, float &t0) const {
         Vec3f L = center - orig;
         float tca = L * dir;
         float d2 = L * L - tca * tca;

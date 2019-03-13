@@ -1,10 +1,10 @@
 #include "config.h"
-#include "vec.h"
 #include "image.h"
 #include "light.h"
 #include "macro.h"
 #include "material.h"
 #include "sphere.h"
+#include "vec.h"
 
 Vec3f reflect(const Vec3f I, const Vec3f N) { return I - N * 2.f * (I * N); }
 
@@ -24,36 +24,33 @@ Vec3f refract(const Vec3f I, const Vec3f N,
     return k < 0 ? Vec3f(0, 0, 0) : I * eta + n * (eta * cosi - sqrtf(k));
 }
 
-__RAYTRACER_API__ bool scene_intersect(__in__ const Vec3f orig,
-                                       __in__ const Vec3f dir,
-                                       __in__ const std::vector<void *> spheres,
-                                       __out__ Vec3f &hit, __out__ Vec3f &N,
-                                       __out__ mesh_ptr &pmesh) {
+bool scene_intersect(const Vec3f orig, const Vec3f dir,
+                     const std::vector<Mesh *> spheres, Vec3f &hit, Vec3f &N,
+                     Mesh **ppmesh) {
     float spheres_dist = std::numeric_limits<float>::max();
     for (size_t i = 0; i < spheres.size(); i++) {
         float dist_i;
-        /* TODO get mesh type */
-        if (((Sphere *)(spheres[i]))->ray_intersect(orig, dir, dist_i) &&
+        if (spheres[i]->ray_intersect(orig, dir, dist_i) &&
             dist_i < spheres_dist) {
             spheres_dist = dist_i;
             hit = orig + dir * dist_i;
-            N = (hit - ((Sphere *)(spheres[i]))->center).normalize();
-            pmesh = spheres[i];
+            N = (hit - spheres[i]->center).normalize();
+            *ppmesh = spheres[i];
         }
     }
     return spheres_dist < 1000;
 }
 
 Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
-               const std::vector<void *> spheres, std::vector<Light> lights,
+               const std::vector<Mesh *> spheres, std::vector<Light> lights,
                size_t depth = 0) {
     Vec3f point, N;
     Material material;
-    mesh_ptr pmesh;
+    Mesh *pmesh;
     // if there is no reflection and intersection with other object, return the
     // background color
     if (depth > reflection_depth ||
-        !scene_intersect(orig, dir, spheres, point, N, pmesh)) {
+        !scene_intersect(orig, dir, spheres, point, N, &pmesh)) {
         return Vec3f(0.2, 0.7, 0.8);  // background color
     }
     material = ((Sphere *)pmesh)->material;
@@ -89,9 +86,9 @@ Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
                 : point + N * 1e-3;  // checking if the point lies in the shadow
                                      // of the lights[i]
         Vec3f shadow_pt, shadow_N;
-        mesh_ptr tmpmesh;
+        Mesh *tmpmesh;
         if (scene_intersect(shadow_orig, light_dir, spheres, shadow_pt,
-                            shadow_N, tmpmesh) &&
+                            shadow_N, &tmpmesh) &&
             (shadow_pt - shadow_orig).norm() < light_distance)
             continue;
 
@@ -124,7 +121,7 @@ int main() {
                     1425.);
 
     // add some spheres with material into the scene
-    std::vector<void *> spheres;
+    std::vector<Mesh *> spheres;
     spheres.push_back(new Sphere(Vec3f(-3, 0, -16), 2, ivory));
     spheres.push_back(new Sphere(Vec3f(-1.0, -1.5, -12), 2, glass));
     spheres.push_back(new Sphere(Vec3f(1.5, -0.5, -18), 3, red_rubber));
@@ -148,6 +145,7 @@ int main() {
             framebuffer[i + j * width] = c;
         }
     }
+
     // save the result to file
     render2img("out.ppm", width, height, framebuffer);
     return 0;
