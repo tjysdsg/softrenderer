@@ -3,7 +3,7 @@
 #include "light.h"
 #include "macro.h"
 #include "material.h"
-#include "sphere.h"
+#include "mesh.h"
 #include "vec.h"
 
 Vec3f reflect(const Vec3f I, const Vec3f N) { return I - N * 2.f * (I * N); }
@@ -53,7 +53,7 @@ Vec3f emit_ray(const Vec3f &orig, const Vec3f &dir,
         !scene_intersect(orig, dir, spheres, point, N, &pmesh)) {
         return Vec3f(0.2, 0.7, 0.8);  // background color
     }
-    material = ((Sphere *)pmesh)->material;
+    material = dynamic_cast<Sphere *>(pmesh)->material;
     // calculate reflection
     Vec3f reflect_dir = reflect(dir, N).normalize();
     Vec3f reflect_orig =

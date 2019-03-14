@@ -1,5 +1,5 @@
-#ifndef __SPHERE_H__
-#define __SPHERE_H__
+#ifndef __MESH_H__
+#define __MESH_H__
 #include "macro.h"
 #include "material.h"
 #include "vec.h"
@@ -40,4 +40,4 @@ public:
     }
 };
 
-#endif  // __SPHERE_H__
+#endif  // __MESH_H__
