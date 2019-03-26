@@ -1,7 +1,8 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
-#include "vec.h"
+#include "math/vector3.h"
+#include "math/vector4.h"
 
 struct Material {
     Vec3f diffuse_color;
