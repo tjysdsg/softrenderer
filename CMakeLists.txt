@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
-project (raytracer)
+project (demo)
 set(CXX_STANDARD 14)
 aux_source_directory(${PROJECT_SOURCE_DIR}/src SRCS)
+aux_source_directory(${PROJECT_SOURCE_DIR}/src/math SRCS)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 add_executable(raytracer ${SRCS})
